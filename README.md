@@ -1,0 +1,2 @@
+# MapDownloaderCore
+ amına bile core
