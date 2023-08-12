@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Security.Principal;
+﻿using System.Security.Principal;
 using Microsoft.Win32;
 
 namespace MapDownloader
@@ -36,15 +35,14 @@ namespace MapDownloader
             Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell");
             Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell\open");
 
-            string? appPath = Assembly.GetEntryAssembly()?.Location;
+            string? appPath = AppContext.BaseDirectory + @"\MapDownloader.exe";
 
             Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell\open\command").SetValue(null, "\"" + appPath + "\" " + "\"" + "%1" + "\"");
         }
 
         public static bool Exists()
         {
-            if (Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\MapDownloader\Capabilities", ".http", null) != null) return true;
-            else return false;
+            return Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\MapDownloader\Capabilities", ".http", null) != null;
         }
     }
 }

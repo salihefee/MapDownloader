@@ -7,16 +7,24 @@ namespace MapDownloader
     {
         public static void SetBrowser()
         {
-            using var ofd = new OpenFileDialog();
-            ofd.Filter = "Exe Files (.exe)|*.exe";
-            ofd.Title = "Choose your default browser's executable.";
-            string BrowserPath;
-            if (ofd.ShowDialog() == DialogResult.OK)
+            Thread thread = new Thread(() =>
             {
-                BrowserPath = ofd.FileName;
-                RegistryKey browserPathKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\MapDownloader");
-                browserPathKey.SetValue("BrowserPath", BrowserPath);
-            }
+                using var ofd = new OpenFileDialog();
+                ofd.Filter = "Exe Files (.exe)|*.exe";
+                ofd.Title = "Choose your default browser's executable.";
+                string BrowserPath;
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    BrowserPath = ofd.FileName;
+                    RegistryKey browserPathKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\MapDownloader");
+                    browserPathKey.SetValue("BrowserPath", BrowserPath);
+                }
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
         }
         public static bool IsSet()
         {

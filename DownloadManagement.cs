@@ -7,21 +7,21 @@ namespace MapDownloader
 {
     internal class DownloadManagement
     {
-        public static async void DownloadMap(string link)
+        public static async Task DownloadMap(string link)
         {
-            var setId = await LinkManagement.GetSetId(link);
+            var setId = Program.setId;
             var fileName = await LinkManagement.GetFileName(link);
 
             try
             {
-                await DownloadFileAsync(setId, fileName);
+                await DownloadFileAsync(setId!, fileName!);
 
-                Process.Start(@"C:\Windows\Temp\" + fileName);
+                Process.Start("explorer.exe", @"C:\Windows\Temp\" + fileName);
             }
-            
+
             catch (WebException)
             {
-                Process.Start(DbReader.OsuPathKey.GetValue("BrowserPath").ToString(), link);
+                Process.Start(DownloadCheck.OsuPathKey.GetValue("BrowserPath")!.ToString()!, link);
                 Environment.Exit(0);
             }
         }

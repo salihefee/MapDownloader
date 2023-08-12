@@ -4,10 +4,10 @@ namespace MapDownloader
 {
     internal class Program
     {
+        public static string? setId;
         [STAThread]
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            args = new string[] { "https://osu.ppy.sh/beatmaps/4068994" };
             //string appPath = Assembly.GetEntryAssembly().Location;
 
             //if (Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell\open\command").GetValue(null).ToString() != "\"" + appPath + "\" " + "\"" + "%1" + "\"")
@@ -23,7 +23,7 @@ namespace MapDownloader
                 MessageBox.Show("To use this program, set your default browser as MapDownloader.exe and choose your default browser's executable after clicking OK.");
                 BrowserManagement.SetBrowser();
                 MessageBox.Show("And on this step, choose your osu! folder.");
-                DbReader.SetOsuPath();
+                DownloadCheck.SetOsuPath();
                 return;
             }
 
@@ -33,7 +33,7 @@ namespace MapDownloader
                 return;
             }
 
-            var browserPath = DbReader.OsuPathKey.GetValue("BrowserPath")?.ToString()!;
+            var browserPath = DownloadCheck.OsuPathKey.GetValue("BrowserPath")?.ToString()!;
 
             foreach (string arg in args)
             {
@@ -43,21 +43,23 @@ namespace MapDownloader
                     Process.Start(browserPath, arg);
                     return;
                 }
-
-                if (LinkManagement.GetSetId(arg) == null)
+                setId = await LinkManagement.GetSetId(arg);
+                if (setId == null)
                 {
                     MessageBox.Show("The map couldn't be found on chimu.moe.");
                     Process.Start(browserPath, arg);
                     return;
                 }
 
-                if (!DbReader.IsDownloaded(arg))
+                if (!DownloadCheck.IsDownloaded(arg))
                 {
-                    DownloadManagement.DownloadMap(arg);
+                    await DownloadManagement.DownloadMap(arg);
 
-                    return;
+                    return; 
                 }
+
                 Process.Start(browserPath, arg);
+                return;
             }
         }
     }
