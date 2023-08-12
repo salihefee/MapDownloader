@@ -1,2 +1,2 @@
 # MapDownloaderCore
- amına bile core
+ Automatic map downloader for the rhythm game osu!
