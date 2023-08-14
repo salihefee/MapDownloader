@@ -1,4 +1,8 @@
 ﻿using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
+using HttpClientProgress;
+using Newtonsoft.Json;
 
 namespace MapDownloader
 {
@@ -10,7 +14,7 @@ namespace MapDownloader
         static async Task Main(string[] args)
         {
             // Used for debug purposes
-            //args = new string[] { "https://osu.ppy.sh/beatmaps/158123" };
+            //args = new string[] { "https://osu.ppy.sh/beatmaps/2123199" };
 
             var adminStatus = RegistryManagement.IsAdministrator();
 
@@ -51,9 +55,57 @@ namespace MapDownloader
 
                 if (!DownloadCheck.IsDownloaded(arg))
                 {
-                    await DownloadManagement.DownloadMap(arg);
+                    async Task DownloadFile(string setId)
+                    {
+                        using var client = new HttpClient();
+                        var chimuUrl = "https://chimu.moe/d/" + setId;
+                        var nerinyanUrl = "https://api.nerinyan.moe/d/" + setId;
+                        string fileName;
 
-                    return; 
+                        try
+                        {
+                            var url = "https://api.chimu.moe/v1/set/" + setId;
+                            var chimuResponse = await client.GetStringAsync(url);
+
+                            var m = JsonConvert.DeserializeObject<ChimuSetJSON>(chimuResponse);
+                            fileName = LinkManagement.Filter($"{m!.SetId} {m.Artist_Unicode} - {m.Title_Unicode}.osz");
+                        }
+                        catch (HttpRequestException)
+                        {
+                            Process.Start(browserPath, arg);
+                            return;
+                        }
+
+                        var filePath = Path.Combine(Path.GetTempPath(), fileName);
+
+                        var progress = new Progress<float>();
+                        progress.ProgressChanged += Progress_ProgressChanged!;
+
+                        using (var file = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                        {
+                            try
+                            {
+                                await client.DownloadDataAsync(chimuUrl, file, progress);
+                            }
+                            
+                            catch (Exception)
+                            {
+                                await client.DownloadDataAsync(nerinyanUrl, file, progress);
+                            }
+                            
+                        }
+                        Process.Start("explorer.exe", filePath);
+                    }
+
+                    void Progress_ProgressChanged(object sender, float progress)
+                    {
+                        // Do something with your progress
+                        Console.WriteLine(progress);
+                    }
+
+                    await DownloadFile(setId);
+
+                    return;
                 }
 
                 Process.Start(browserPath, arg);
