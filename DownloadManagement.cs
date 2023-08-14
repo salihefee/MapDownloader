@@ -29,10 +29,21 @@ namespace MapDownloader
         public static async Task DownloadFileAsync(string setId, string fileName)
         {
             using var httpClient = new HttpClient();
-            var fileUrl = "https://chimu.moe/d/" + setId;
+            var chimuUrl = "https://chimu.moe/d/" + setId;
+            var nerinyanUrl = "https://api.nerinyan.moe/d/" + setId;
             var filePath = @"C:\Windows\Temp\" + fileName;
 
-            using var response = await httpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead);
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await httpClient.GetAsync(chimuUrl, HttpCompletionOption.ResponseHeadersRead);
+            }
+            catch (WebException)
+            {
+                response = await httpClient.GetAsync(nerinyanUrl, HttpCompletionOption.ResponseHeadersRead);
+            }
+
             await using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
             await using var streamToWriteTo = File.Open(filePath, FileMode.Create);
             await streamToReadFrom.CopyToAsync(streamToWriteTo);
