@@ -35,7 +35,11 @@ namespace MapDownloader
 
         public static async Task<string?> GetSetId(string url)
         {
-            using var client = new HttpClient();
+            var handler = new HttpClientHandler()
+            {
+                AllowAutoRedirect = false,
+            };
+            using var client = new HttpClient(handler);
             using var message = new HttpRequestMessage(HttpMethod.Head, url);
             var response = await client.SendAsync(message);
             var statusCode = (int)response.StatusCode;
@@ -43,7 +47,7 @@ namespace MapDownloader
             if (statusCode < 200 || statusCode >= 400)
                 return null;
 
-            var match = Regex.Match(response.RequestMessage!.RequestUri!.ToString(), @"[0-9]+");
+            var match = Regex.Match(response.Headers.Location!.ToString(), @"[0-9]+");
             return match.Success ? match.Value : null;
         }
 

@@ -5,15 +5,12 @@ namespace MapDownloader
     internal class Program
     {
         public static string? setId;
+
         [STAThread]
         static async Task Main(string[] args)
         {
-            //string appPath = Assembly.GetEntryAssembly().Location;
-
-            //if (Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell\open\command").GetValue(null).ToString() != "\"" + appPath + "\" " + "\"" + "%1" + "\"")
-            //{
-            //    Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell\open\command").SetValue(null, "\"" + appPath + "\" " + "\"" + "%1" + "\"");
-            //}
+            // Used for debug purposes
+            //args = new string[] { "https://osu.ppy.sh/beatmaps/158123" };
 
             var adminStatus = RegistryManagement.IsAdministrator();
 
@@ -37,13 +34,14 @@ namespace MapDownloader
 
             foreach (string arg in args)
             {
-
                 if (!LinkManagement.IsMapLink(arg))
                 {
                     Process.Start(browserPath, arg);
                     return;
                 }
+
                 setId = await LinkManagement.GetSetId(arg);
+
                 if (setId == null)
                 {
                     MessageBox.Show("The map couldn't be found on chimu.moe.");
