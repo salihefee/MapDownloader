@@ -21,7 +21,7 @@ namespace MapDownloader
             if (adminStatus)
             {
                 RegistryManagement.CreateRegistry();
-                MessageBox.Show("To use this program, set your default browser as MapDownloader.exe and choose your default browser's executable after clicking OK.");
+                MessageBox.Show("To use this program, set your default browser as MapDownloader.exe and choose your current default browser's executable after clicking OK.");
                 BrowserManagement.SetBrowser();
                 MessageBox.Show("And on this step, choose your osu! folder.");
                 DownloadCheck.SetOsuPath();
@@ -59,7 +59,6 @@ namespace MapDownloader
                     {
                         using var client = new HttpClient();
                         var chimuUrl = "https://chimu.moe/d/" + setId;
-                        var nerinyanUrl = "https://api.nerinyan.moe/d/" + setId;
                         string fileName;
 
                         try
@@ -83,16 +82,7 @@ namespace MapDownloader
 
                         using (var file = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
                         {
-                            try
-                            {
-                                await client.DownloadDataAsync(chimuUrl, file, progress);
-                            }
-                            
-                            catch (Exception)
-                            {
-                                await client.DownloadDataAsync(nerinyanUrl, file, progress);
-                            }
-                            
+                            await client.DownloadDataAsync(chimuUrl, file, progress);
                         }
                         Process.Start("explorer.exe", filePath);
                     }
