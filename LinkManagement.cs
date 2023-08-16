@@ -51,6 +51,24 @@ namespace MapDownloader
             return match.Success ? match.Value : null;
         }
 
+        public static async Task<string?> GetFileName(string link)
+        {
+            try
+            {
+                using var httpClient = new HttpClient();
+                var url = "https://api.chimu.moe/v1/set/" + Program.setId;
+                var chimuResponse = await httpClient.GetStringAsync(url);
+
+                var m = JsonConvert.DeserializeObject<ChimuSetJSON>(chimuResponse);
+
+                return Filter($"{m!.SetId} {m.Artist_Unicode} - {m.Title_Unicode}.osz");
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
+
         //public static async Task<string?> GetFileHash(string link)
         //{
         //    var id = GetId(link);
