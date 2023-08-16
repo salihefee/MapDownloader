@@ -1,7 +1,4 @@
 ﻿using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
-using Newtonsoft.Json;
 
 namespace MapDownloader
 {
@@ -13,7 +10,7 @@ namespace MapDownloader
         static async Task Main(string[] args)
         {
             // Used for debug purposes
-            args = new string[] { "https://osu.ppy.sh/beatmaps/2123199" };
+            //args = new string[] { "https://osu.ppy.sh/beatmaps/2123199" };
 
             var adminStatus = RegistryManagement.IsAdministrator();
 
