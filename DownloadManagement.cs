@@ -30,7 +30,6 @@ namespace MapDownloader
         {
             using var httpClient = new HttpClient();
             var chimuUrl = "https://chimu.moe/d/" + setId;
-            var nerinyanUrl = "https://api.nerinyan.moe/d/" + setId;
             var filePath = @"C:\Windows\Temp\" + fileName;
 
             var response = await httpClient.GetAsync(chimuUrl, HttpCompletionOption.ResponseHeadersRead);
