@@ -10,11 +10,11 @@ namespace MapDownloader
         static async Task Main(string[] args)
         {
             // Used for debug purposes
-            //args = new string[] { "https://osu.ppy.sh/beatmaps/3814127" };
+            //args = new string[] { "https://github.com/salihefee/MapDownloader/releases/tag/v2.3" };
 
             var browserPath = DownloadCheck.OsuPathKey.GetValue("BrowserPath")?.ToString()!;
 
-            if (Process.GetProcessesByName("osu!").Length != 0)
+            if (Process.GetProcessesByName("osu!").Length == 0 && args.Length == 0)
             {
                 var adminStatus = RegistryManagement.IsAdministrator();
 
@@ -33,7 +33,10 @@ namespace MapDownloader
                     MessageBox.Show("Run the program as administrator for the initial setup.");
                     return;
                 }
+            }
 
+            if (args.Length > 0)
+            {
                 foreach (string arg in args)
                 {
                     if (!LinkManagement.IsMapLink(arg))
@@ -60,10 +63,6 @@ namespace MapDownloader
                     Process.Start(browserPath, arg);
                     return;
                 }
-            }
-            foreach (string arg in args)
-            {
-                Process.Start(browserPath, arg);
             }
         }
     }
