@@ -10,7 +10,7 @@ namespace MapDownloader
         static async Task Main(string[] args)
         {
             // Used for debug purposes
-            args = new string[] { "https://osu.ppy.sh/beatmaps/3814127" };
+            //args = new string[] { "https://osu.ppy.sh/beatmaps/3814127" };
 
             var browserPath = DownloadCheck.OsuPathKey.GetValue("BrowserPath")?.ToString()!;
 
