@@ -27,7 +27,7 @@ namespace MapDownloader
                     DownloadCheck.SetOsuPath();
                     return;
                 }
-
+                // I'm aware that the args.Length check has already been done but i don't know how removing that would affect the result of the logic
                 if (args.Length == 0 || adminStatus || !BrowserManagement.IsSet())
                 {
                     MessageBox.Show("Run the program as administrator for the initial setup.");
