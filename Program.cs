@@ -14,7 +14,7 @@ namespace MapDownloader
 
             var browserPath = DownloadCheck.OsuPathKey.GetValue("BrowserPath")?.ToString()!;
 
-            if (Process.GetProcessesByName("osu!").Length == 0 && args.Length == 0)
+            if (args.Length == 0)
             {
                 var adminStatus = RegistryManagement.IsAdministrator();
 
