@@ -1,26 +1,22 @@
 ﻿using Microsoft.Win32;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace MapDownloader
 {
-    internal class DownloadCheck
+    internal static class DownloadCheck
     {
         public static readonly RegistryKey OsuPathKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\MapDownloader");
 
         public static void SetOsuPath()
         {
-            Thread thread = new Thread(() =>
+            var thread = new Thread(() =>
             {
                 using FolderBrowserDialog fbd = new();
                 fbd.Description = "Choose your osu! folder.";
-                string osuPath;
-                if (fbd.ShowDialog() == DialogResult.OK)
-                {
-                    osuPath = fbd.SelectedPath;
-                    OsuPathKey.SetValue("osuPath", osuPath);
-                }
+                if (fbd.ShowDialog() != DialogResult.OK) return;
+                var osuPath = fbd.SelectedPath;
+                OsuPathKey.SetValue("osuPath", osuPath);
             });
 
             thread.SetApartmentState(ApartmentState.STA);
@@ -29,13 +25,17 @@ namespace MapDownloader
 
         }
 
-        public static bool IsDownloaded(string url)
+        public static bool IsDownloaded(string setId)
         {
-            string rootPath = OsuPathKey.GetValue("osuPath")!.ToString()! + @"\Songs";
-            string[] dirs = Directory.GetDirectories(rootPath, "*", SearchOption.TopDirectoryOnly);
-            string dirsString = string.Concat(dirs);
+            var rootPath = OsuPathKey.GetValue("osuPath") + @"\Songs";
+            var dirs = Directory.GetDirectories(rootPath, "*", SearchOption.TopDirectoryOnly);
 
-            return dirsString.Contains(Program.setId!);
+            foreach (var folder in dirs)
+            {
+                if (Regex.Match(folder, @"\b" + setId + @"\b").Success) return true;
+            }
+
+            return false;
         }
     }
 }

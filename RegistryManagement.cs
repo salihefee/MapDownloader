@@ -3,7 +3,7 @@ using Microsoft.Win32;
 
 namespace MapDownloader
 {
-    internal class RegistryManagement
+    internal static class RegistryManagement
     {
         public static bool IsAdministrator()
         {
@@ -16,10 +16,10 @@ namespace MapDownloader
         {
             Registry.LocalMachine.CreateSubKey(@"SOFTWARE\MapDownloader");
 
-            RegistryKey capabilities = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\MapDownloader\Capabilities");
-            RegistryKey urlAssociations = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\MapDownloader\Capabilities\URLAssociations");
-            RegistryKey registeredApps = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\RegisteredApplications");
-            RegistryKey MapDownloaderURL = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL");
+            using var capabilities = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\MapDownloader\Capabilities");
+            using var urlAssociations = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\MapDownloader\Capabilities\URLAssociations");
+            using var registeredApps = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\RegisteredApplications");
+            using var MapDownloaderURL = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL");
 
             capabilities.SetValue("ApplicationDescription", "MapDownloader");
             capabilities.SetValue("ApplicationName", "MapDownloader");
@@ -35,7 +35,7 @@ namespace MapDownloader
             Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell");
             Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell\open");
 
-            string? appPath = AppContext.BaseDirectory + @"\MapDownloader.exe";
+            var appPath = AppContext.BaseDirectory + @"\MapDownloader.exe";
 
             Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes\MapDownloaderURL\shell\open\command").SetValue(null, "\"" + appPath + "\" " + "\"" + "%1" + "\"");
         }

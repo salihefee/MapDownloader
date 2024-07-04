@@ -4,11 +4,11 @@ using Newtonsoft.Json;
 
 namespace MapDownloader
 {
-    internal partial class LinkManagement
+    internal static partial class LinkManagement
     {
         public static string GetId(string link)
         {
-            return GetIdRegex().Match(link).Value;
+            return IsNumberRegex().Match(link).Value;
         }
 
         public static string Filter(string str)
@@ -47,27 +47,27 @@ namespace MapDownloader
             if (statusCode < 200 || statusCode >= 400)
                 return null;
 
-            var match = Regex.Match(response.Headers.Location!.ToString(), @"[0-9]+");
+            var match = IsNumberRegex().Match(response.Headers.Location!.ToString());
             return match.Success ? match.Value : null;
         }
 
-        public static async Task<string?> GetFileName(string link)
-        {
-            try
-            {
-                using var httpClient = new HttpClient();
-                var url = "https://api.chimu.moe/v1/set/" + Program.setId;
-                var chimuResponse = await httpClient.GetStringAsync(url);
-
-                var m = JsonConvert.DeserializeObject<ChimuSetJSON>(chimuResponse);
-
-                return Filter($"{m!.SetId} {m.Artist_Unicode} - {m.Title_Unicode}.osz");
-            }
-            catch (HttpRequestException)
-            {
-                return null;
-            }
-        }
+        // public static async Task<string?> GetFileName(string link)
+        // {
+        //     try
+        //     {
+        //         using var httpClient = new HttpClient();
+        //         var url = "https://catboy.best/api/v2/s/" + Program.setId;
+        //         var catboyResponse = await httpClient.GetStringAsync(url);
+        //
+        //         var m = JsonConvert.DeserializeObject<catboySetJSON>(catboyResponse);
+        //
+        //         return Filter($"{Program.setId} {m!.artist} - {m.title}.osz");
+        //     }
+        //     catch (HttpRequestException)
+        //     {
+        //         return null;
+        //     }
+        // }
 
         //public static async Task<string?> GetFileHash(string link)
         //{
@@ -76,9 +76,9 @@ namespace MapDownloader
         //    try
         //    {
         //        using var httpClient = new HttpClient();
-        //        var chimuResponse = await httpClient.GetStringAsync("https://api.chimu.moe/v1/map/" + id);
+        //        var catboyResponse = await httpClient.GetStringAsync("https://api.chimu.moe/v1/map/" + id);
 
-        //        var m = JsonConvert.DeserializeObject<ChimuDiffJSON>(chimuResponse);
+        //        var m = JsonConvert.DeserializeObject<catboyDiffJSON>(catboyResponse);
 
         //        return m!.FileMD5;
         //    }
@@ -89,23 +89,23 @@ namespace MapDownloader
         //}
 
         [GeneratedRegex("[0-9]+")]
-        private static partial Regex GetIdRegex();
+        private static partial Regex IsNumberRegex();
         [GeneratedRegex("[<,>\":/\\\\|?*]")]
         private static partial Regex FilterRegex();
-        [GeneratedRegex("^(https?:\\/\\/osu\\.ppy\\.sh\\/beatmaps\\/[A-Za-z0-9]*)$")]
+        [GeneratedRegex(@"^(https?:\/\/osu\.ppy\.sh\/beatmaps\/[A-Za-z0-9]*)$")]
         private static partial Regex IsMapLinkRegex();
     }
-    class ChimuDiffJSON
-    {
-        public string? ParentSetId { get; set; }
-        public string? FileMD5 { get; set; }
-        public string? error_code { get; set; }
-    }
 
-    class ChimuSetJSON
+    // internal class catboyDiffJSON
+    // {
+    //     public string? ParentSetId { get; set; }
+    //     public string? FileMD5 { get; set; }
+    //     public string? error_code { get; set; }
+    // }
+
+    internal class catboySetJSON
     {
-        public string? SetId { get; set; }
-        public string? Title_Unicode { get; set; }
-        public string? Artist_Unicode { get; set; }
+        public string? title { get; set; }
+        public string? artist { get; set; }
     }
 }

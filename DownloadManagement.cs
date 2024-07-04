@@ -2,21 +2,20 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Mime;
 
 namespace MapDownloader
 {
-    internal class DownloadManagement
+    internal static class DownloadManagement
     {
         public static async Task DownloadMap(string link)
         {
             var setId = Program.setId;
-            var fileName = await LinkManagement.GetFileName(link);
 
             try
             {
-                await DownloadFileAsync(setId!, fileName!);
-
-                Process.Start("explorer.exe", @"C:\Windows\Temp\" + fileName);
+                await DownloadFileAsync(setId!);
             }
 
             catch (HttpRequestException)
@@ -26,17 +25,24 @@ namespace MapDownloader
             }
         }
 
-        public static async Task DownloadFileAsync(string setId, string fileName)
+        public static async Task DownloadFileAsync(string setId)
         {
             using var httpClient = new HttpClient();
-            var chimuUrl = "https://chimu.moe/d/" + setId;
-            var filePath = @"C:\Windows\Temp\" + fileName;
+            var catboyUrl = "https://catboy.best/d/" + setId;
+            
+            var response = await httpClient.GetAsync(catboyUrl, HttpCompletionOption.ResponseHeadersRead);
 
-            var response = await httpClient.GetAsync(chimuUrl, HttpCompletionOption.ResponseHeadersRead);
+            var cd = response.Content.Headers.ContentDisposition!.ToString();
+
+            var fileName = new ContentDisposition(cd).FileName;
+            
+            var filePath = @"C:\Windows\Temp\" + fileName;
 
             await using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
             await using var streamToWriteTo = File.Open(filePath, FileMode.Create);
             await streamToReadFrom.CopyToAsync(streamToWriteTo);
+            
+            Process.Start("explorer.exe", filePath);
         }
     }
 }
